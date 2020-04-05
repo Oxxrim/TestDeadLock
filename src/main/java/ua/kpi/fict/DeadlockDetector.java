@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class DeadlockDetector {
+public class DeadlockDetector implements Runnable {
     private final DeadlockHandler deadlockHandler;
     private final long period;
     private final TimeUnit unit;
@@ -15,7 +15,7 @@ public class DeadlockDetector {
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
 
-    final Runnable deadlockCheck = new Runnable() {
+//    final Runnable deadlockCheck = new Runnable() {
         @Override
         public void run() {
             long[] deadlockedThreadIds = DeadlockDetector.this.mbean.findDeadlockedThreads();
@@ -27,7 +27,7 @@ public class DeadlockDetector {
                 DeadlockDetector.this.deadlockHandler.handleDeadlock(threadInfos);
             }
         }
-    };
+//    };
 
     public DeadlockDetector(final DeadlockHandler deadlockHandler,
                             final long period, final TimeUnit unit) {
@@ -37,7 +37,6 @@ public class DeadlockDetector {
     }
 
     public void start() {
-        this.scheduler.scheduleAtFixedRate(
-                this.deadlockCheck, this.period, this.period, this.unit);
+        this.scheduler.scheduleAtFixedRate(this, this.period, this.period, this.unit);
     }
 }
